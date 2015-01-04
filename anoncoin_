@@ -59,7 +59,7 @@ def fetch_blocks():
 
 def fetch_connections():
   connection = getData("getconnectioncount")
-  print('connection.value %s' % connection )
+  print('connections.value %s' % connection )
   exit(0)
 
 def fetch_difficulty():
