@@ -1,0 +1,92 @@
+#!/usr/bin/env python
+# anoncoin server stats
+# drgr33n <cheezybudz@mail.i2p>
+# Version 0.1 alpha
+# Get stats from your anoncoin server <http://anoncoin.i2p>
+# Create links to this plugin and name them
+# -
+# -
+
+import json
+import requests
+import os
+import sys
+
+#GLOBALS
+url = "127.0.0.1"
+rpcPort = "9990"
+username = "drgr33n"
+password = "Wh0RJujGmI"
+
+def getData(rpcMethod):
+	strUrl = "http://" + username + ":" + password + "@" + url + ":" + rpcPort 
+	rpcInput = json.dumps({"jsonrpc":"1.0","id":rpcMethod,"method":rpcMethod,"params":[]})
+	rpcOutput = requests.post(strUrl, rpcInput)
+	rpcRaw = json.loads(rpcOutput.text)
+	return rpcRaw.get('result')
+
+def autoconf():
+        print('yes')
+        exit(0)
+
+def config():
+        if 'blocks' == plugin_var:
+                print('graph_title anoncoin blocks')
+                print('graph_vlabel blocks')
+                print('graph_info Total blocks')
+                print('graph_category anoncoin')
+                print('blocks.label Total blocks')
+        elif 'connections' == plugin_var:
+                print('graph_title anoncoin connections')
+                print('graph_vlabel anoncoin connections')
+                print('graph_category anoncoin')
+                print('connections.label anoncoin connections')
+	elif 'difficulty' == plugin_var:
+                print('graph_title anoncoin difficulty')
+                print('graph_vlabel anoncoin difficulty')
+                print('graph_category anoncoin')
+                print('difficulty.label anoncoin difficulty')
+        else:
+                raise ValueError, "unknown parameter '%s'" % plugin_var
+                exit(1)
+
+def fetch_blocks():
+  blocks = getData("getblockcount")
+  print('blocks.value %s' % blocks )
+  exit(0)
+
+def fetch_connections():
+  connection = getData("getconnectioncount")
+  print('connection.value %s' % connection )
+  exit(0)
+
+def fetch_difficulty():
+  difficulty = getData("getdifficulty")
+  print('difficulty.value %s' % difficulty )
+  exit(0)
+
+def fetch():
+        if 'blocks' == plugin_var:
+                fetch_blocks()
+        elif 'connections' == plugin_var:
+                fetch_connections()
+        elif 'difficulty' == plugin_var:
+                fetch_difficulty()
+	else:
+                raise ValueError, "unknown parameter '%s'" % plugin_var
+                exit(1)
+
+#main
+plugin_name=list(os.path.split(sys.argv[0]))[1]
+plugin_var=plugin_name.split('_', 1)[-1]
+if __name__ == '__main__':
+  if len(sys.argv)>1 :
+    if sys.argv[1]=="config" :
+      config()
+    elif sys.argv[1]=="autoconf" :
+      autoconf()
+    elif sys.argv[1]!="":
+      raise ValueError, "unknown parameter '%s'" % sys.argv[1]
+  fetch()
+
+
