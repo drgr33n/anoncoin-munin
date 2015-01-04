@@ -4,8 +4,9 @@
 # Version 0.1 alpha
 # Get stats from your anoncoin server <http://anoncoin.i2p>
 # Create links to this plugin and name them
-# -
-# -
+# - anoncoin_blocks
+# - anoncoin_connections
+# - anoncoin_difficulty
 
 import json
 import requests
@@ -15,9 +16,10 @@ import sys
 #GLOBALS
 url = "127.0.0.1"
 rpcPort = "9990"
-username = "drgr33n"
-password = "Wh0RJujGmI"
+username = "someuser"
+password = "somepassword"
 
+#DO NOT EDIT BELOW
 def getData(rpcMethod):
 	strUrl = "http://" + username + ":" + password + "@" + url + ":" + rpcPort 
 	rpcInput = json.dumps({"jsonrpc":"1.0","id":rpcMethod,"method":rpcMethod,"params":[]})
