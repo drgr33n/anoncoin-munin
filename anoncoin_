@@ -21,11 +21,17 @@ password = "somepassword"
 
 #DO NOT EDIT BELOW
 def getData(rpcMethod):
-	strUrl = "http://" + username + ":" + password + "@" + url + ":" + rpcPort 
-	rpcInput = json.dumps({"jsonrpc":"1.0","id":rpcMethod,"method":rpcMethod,"params":[]})
+	strUrl = "http://" + username + ":" + password + "@" + url + ":" + rpcPort
+	if 'totalmoney' == rpcMethod:
+		rpcInput = json.dumps({"jsonrpc":"1.0","id":rpcMethod,"method":"getinfo","params":[]})
+	else:
+		rpcInput = json.dumps({"jsonrpc":"1.0","id":rpcMethod,"method":rpcMethod,"params":[]})
 	rpcOutput = requests.post(strUrl, rpcInput)
 	rpcRaw = json.loads(rpcOutput.text)
-	return rpcRaw.get('result')
+	if 'totalmoney' == rpcMethod:
+		return rpcRaw.get('result').get('moneysupply')
+	else:
+		return rpcRaw.get('result')
 
 def autoconf():
         print('yes')
@@ -35,45 +41,62 @@ def config():
         if 'blocks' == plugin_var:
                 print('graph_title anoncoin blocks')
                 print('graph_vlabel blocks')
-                print('graph_info Total blocks')
+                print('graph_info Total Blocks')
                 print('graph_category anoncoin')
                 print('blocks.label Total blocks')
+		print('graph_args --base 1000 --lower-limit 0')
         elif 'connections' == plugin_var:
                 print('graph_title anoncoin connections')
-                print('graph_vlabel anoncoin connections')
+                print('graph_vlabel connections')
                 print('graph_category anoncoin')
-                print('connections.label anoncoin connections')
+                print('connections.label Total Connections')
+		print('graph_args --base 1000 --lower-limit 0')
 	elif 'difficulty' == plugin_var:
                 print('graph_title anoncoin difficulty')
-                print('graph_vlabel anoncoin difficulty')
+                print('graph_vlabel Difficulty')
                 print('graph_category anoncoin')
                 print('difficulty.label anoncoin difficulty')
+		print('graph_args --base 1000 --lower-limit 0')
+        elif 'totalmoney' == plugin_var:
+                print('graph_title anoncoin total money')
+                print('graph_vlabel Total money')
+                print('graph_category anoncoin')
+                print('totalmoney.label Total money')
+                print('graph_args --base 1000 --lower-limit 0')
         else:
                 raise ValueError, "unknown parameter '%s'" % plugin_var
                 exit(1)
 
-def fetch_blocks():
+def fetchBlocks():
   blocks = getData("getblockcount")
   print('blocks.value %s' % blocks )
   exit(0)
 
-def fetch_connections():
+def fetchConnections():
   connection = getData("getconnectioncount")
   print('connections.value %s' % connection )
   exit(0)
 
-def fetch_difficulty():
+def fetchDifficulty():
   difficulty = getData("getdifficulty")
   print('difficulty.value %s' % difficulty )
   exit(0)
 
+def fetchTotalmoney():
+  totalmoney = getData("totalmoney")
+  print('totalmoney.value %s' % totalmoney )
+  exit(0)
+
+
 def fetch():
         if 'blocks' == plugin_var:
-                fetch_blocks()
+                fetchBlocks()
         elif 'connections' == plugin_var:
-                fetch_connections()
+                fetchConnections()
         elif 'difficulty' == plugin_var:
-                fetch_difficulty()
+                fetchDifficulty()
+        elif 'totalmoney' == plugin_var:
+                fetchTotalmoney()
 	else:
                 raise ValueError, "unknown parameter '%s'" % plugin_var
                 exit(1)
